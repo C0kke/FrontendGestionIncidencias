@@ -1,0 +1,276 @@
+/* 🎨 Base layout */
+.main-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #f8f9fb;
+  font-family: "Inter", sans-serif;
+}
+
+.content-area {
+  flex: 1;
+  padding: 1.5rem 2rem;
+}
+
+/* 🧭 Encabezado principal */
+.usuarios-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.header-text h1 {
+  font-size: 1.7rem;
+  color: #2b3a67;
+  margin: 0;
+}
+
+.header-text p {
+  color: #6b7280;
+  font-size: 0.95rem;
+}
+
+/* 📦 Contenedor principal */
+.usuarios-container {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* 🧾 Barra de búsqueda y filtros */
+.filter-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.search-input {
+  flex: 1;
+  min-width: 250px;
+  padding: 0.6rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.search-input:focus {
+  border-color: #4f46e5;
+}
+
+.filter-toggle-button {
+  background-color: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.6rem 1rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.filter-toggle-button:hover {
+  background-color: #4338ca;
+}
+
+/* 🎛️ Filtros desplegables */
+.filters-dropdown {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  background-color: #f9fafb;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  border: 1px solid #e5e7eb;
+  animation: fadeIn 0.3s ease;
+}
+
+.filter-group label {
+  display: block;
+  font-size: 0.85rem;
+  color: #374151;
+  margin-bottom: 0.25rem;
+}
+
+.filter-group select {
+  width: 100%;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid #d1d5db;
+  font-size: 0.9rem;
+  background-color: white;
+  outline: none;
+}
+
+.filter-group select:focus {
+  border-color: #4f46e5;
+}
+
+/* 🧮 Tabla */
+.table-container {
+  overflow-x: auto;
+  border-radius: 0.75rem;
+  border: 1px solid #e5e7eb;
+}
+
+.usuarios-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 900px;
+}
+
+.usuarios-table th {
+  background-color: #f1f5f9;
+  color: #374151;
+  text-align: left;
+  padding: 0.75rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.usuarios-table td {
+  padding: 0.75rem;
+  font-size: 0.9rem;
+  color: #374151;
+  border-bottom: 1px solid #e5e7eb;
+  vertical-align: middle;
+}
+
+.usuarios-table tr:hover {
+  background-color: #f9fafb;
+}
+
+/* 🟢 Badges */
+.role-badge {
+  display: inline-block;
+  padding: 0.35rem 0.65rem;
+  border-radius: 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  color: white;
+}
+
+.admin-badge {
+  background-color: #ef4444; /* alta */
+}
+
+.user-badge {
+  background-color: #f59e0b; /* media */
+}
+
+.neutral-badge {
+  background-color: #10b981; /* baja */
+}
+
+/* ⚙️ Acciones */
+.actions-container {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.action-button {
+  padding: 0.4rem 0.8rem;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.edit-button {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.edit-button:hover {
+  background-color: #2563eb;
+}
+
+/* 🕒 Paginación */
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.pagination-button {
+  background-color: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.pagination-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination-button:hover:not(:disabled) {
+  background-color: #4338ca;
+}
+
+.pagination-info {
+  color: #374151;
+  font-size: 0.9rem;
+}
+
+/* 💬 Mensajes */
+.message-box {
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.message-box.success {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.message-box.error {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+/* ⏳ Cargando */
+.loading-container {
+  text-align: center;
+  padding: 2rem;
+  color: #6b7280;
+  font-size: 1rem;
+}
+
+/* 🚫 Sin datos */
+.no-data {
+  text-align: center;
+  padding: 1rem;
+  color: #6b7280;
+}
+
+/* ✨ Animación */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

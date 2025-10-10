@@ -1,0 +1,25 @@
+.main-layout {
+    display: flex;
+    flex-direction: row;
+    min-height: 100vh; /* Mantener la altura */
+    width: 100vw; /* Asegura que ocupe el ancho total de la viewport */
+    background-color: var(--color-bg-light);
+    /* Ya no necesitas justify-content: center */
+}
+.content-title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--color-text-dark);
+    margin-bottom: 0.5rem;
+}
+
+.content-subtitle {
+    font-size: 1.125rem;
+    color: var(--color-text-medium);
+    margin-bottom: 1rem;
+}
+
+.content-text {
+    font-size: 1rem;
+    color: var(--color-text-medium);
+}
