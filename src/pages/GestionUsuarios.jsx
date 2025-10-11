@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from "react";
-import Navbar from "../components/navbar";
 import './styles/GestionUsuarios.css';
-import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import NotificationDropdown from "../components/NotificacionDropdown";
 import DetalleIncidenciaModal from "../components/DetalleIncidenciaModal"; 
 import EditarUsuarioModal from "../components/EditarUsuarioModal";
 import CrearUsuarioModal from "../components/CrearUsuarioModal";
@@ -15,32 +12,9 @@ const GestionUsuarios = () => {
     const [sortField, setSortField] = useState('nombre');
     const [sortDirection, setSortDirection] = useState('asc');
     
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedUsuario, setSelectedUsuario] = useState(null);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-    const [selectedIncidencia, setSelectedIncidencia] = useState(null);
-
-    const navigate = useNavigate();
-
-    useEffect(() => {
-        const user = localStorage.getItem('user');
-        if (!user || user === 'undefined') {
-            navigate('/login');
-            return;
-        }
-
-        try {
-            const userData = JSON.parse(user);
-            if (userData.rol !== 'administrador') {
-                navigate('/');
-                return;
-            }
-        } catch (error) {
-            console.error('Error parsing user data:', error);
-            navigate('/login');
-            return;
-        }
-    }, [navigate]);
 
     useEffect(() => {
         fetchUsuarios();
@@ -60,75 +34,46 @@ const GestionUsuarios = () => {
     };
 
     const handleSort = (field) => {
-        if (sortField === field) {
-            setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-        } else {
-            setSortField(field);
-            setSortDirection('asc');
-        }
+        setSortDirection(prevDirection => (sortField === field && prevDirection === 'asc' ? 'desc' : 'asc'));
+        setSortField(field);
     };
 
     const sortedUsuarios = [...usuarios].sort((a, b) => {
         const aValue = a[sortField]?.toString().toLowerCase() || '';
         const bValue = b[sortField]?.toString().toLowerCase() || '';
         
-        if (sortDirection === 'asc') {
-            return aValue.localeCompare(bValue);
-        } else {
-            return bValue.localeCompare(aValue);
-        }
+        return sortDirection === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
     });
 
-    const handleOpenCreateModal = () => {
-        setIsCreateModalOpen(true);
-    };
-
-    const handleCloseCreateModal = () => {
-        setIsCreateModalOpen(false);
-    };
+    const handleOpenCreateModal = () => setIsCreateModalOpen(true);
+    const handleCloseCreateModal = () => setIsCreateModalOpen(false);
 
     const handleOpenEditModal = (usuario) => {
         setSelectedUsuario(usuario);
-        setIsModalOpen(true);
+        setIsEditModalOpen(true);
     };
     
-
-    const handleCloseModal = () => {
-        setIsModalOpen(false);
+    const handleCloseEditModal = () => {
+        setIsEditModalOpen(false);
         setSelectedUsuario(null);
-        setSelectedIncidencia(null); 
     };
 
     const handleUpdateUsuario = async (updatedUsuario) => {
         try {
-            const response = await axios.put(
-                `${import.meta.env.VITE_API_BASE_URL}/usuarios/${updatedUsuario.id}`,
-                updatedUsuario
-            );
-            
-            setUsuarios(usuarios.map(u => 
-                u.id === updatedUsuario.id ? response.data : u
-            ));
-            
+            await axios.put(`${import.meta.env.VITE_API_BASE_URL}/usuarios/${updatedUsuario.id}`, updatedUsuario);
             setMensaje('Usuario actualizado correctamente');
-            handleCloseModal();
+            handleCloseEditModal();
             fetchUsuarios();
             setTimeout(() => setMensaje(''), 3000);
         } catch (error) {
             console.error("Error al actualizar usuario:", error);
-            setMensaje('Error al actualizar el usuario. Consulta la consola.');
+            setMensaje('Error al actualizar el usuario.');
         }
     };
 
     const handleCreateUsuario = async (newUsuario) => {
         try {
-            const response = await axios.post(
-                `${import.meta.env.VITE_API_BASE_URL}/usuarios`,
-                newUsuario
-            );
-            
-            setUsuarios([...usuarios, response.data]);
-            
+            await axios.post(`${import.meta.env.VITE_API_BASE_URL}/usuarios`, newUsuario);
             setMensaje('Usuario creado correctamente');
             handleCloseCreateModal();
             fetchUsuarios();
@@ -138,32 +83,33 @@ const GestionUsuarios = () => {
             if (error.response?.status === 409) {
                 setMensaje('Error: Ya existe un usuario con ese email.');
             } else {
-                setMensaje('Error al crear el usuario. Consulta la consola.');
+                setMensaje('Error al crear el usuario.');
             }
         }
     };
 
-    const handleDeleteUsuario = async (id) => {
-        if (!window.confirm("¿Seguro que deseas eliminar este usuario?")) return;
+    const handleActivarUsuario = async (id) => {
         try {
-            await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/usuarios/${id}`);
-            setUsuarios(usuarios.filter(u => u.id !== id));
-            setMensaje("Usuario eliminado correctamente");
+            await axios.put(`${import.meta.env.VITE_API_BASE_URL}/usuarios/activar/${id}`);
+            setMensaje("Usuario activado correctamente");
+            fetchUsuarios();
             setTimeout(() => setMensaje(""), 3000);
         } catch (error) {
-            console.error("Error al eliminar usuario:", error);
-            setMensaje("Error al eliminar el usuario. Consulta la consola.");
+            console.error("Error al activar usuario:", error);
+            setMensaje("Error al activar el usuario.");
         }
     };
 
-    const handleOpenIncidenciaDetail = async (incidenciaId) => {
+    const handleDesactivarUsuario = async (id) => {
+        if (!window.confirm("¿Seguro que deseas desactivar esta cuenta?")) return;
         try {
-            const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/incidencias/${incidenciaId}`);
-            
-            setSelectedIncidencia(response.data);
-            setIsModalOpen(true);
+            await axios.put(`${import.meta.env.VITE_API_BASE_URL}/usuarios/desactivar/${id}`);
+            setMensaje("Usuario desactivado correctamente");
+            fetchUsuarios();
+            setTimeout(() => setMensaje(""), 3000);
         } catch (error) {
-            console.error('Error al cargar la incidencia para el modal:', error);
+            console.error("Error al desactivar usuario:", error);
+            setMensaje("Error al desactivar el usuario.");
         }
     };
 
@@ -183,10 +129,8 @@ const GestionUsuarios = () => {
     };
 
     return (
-        <div className="main-layout">
-            <Navbar />
-            <NotificationDropdown onOpenIncidenciaDetail={handleOpenIncidenciaDetail} />
-            <div className="content-area usuarios-container">
+        <>
+            <div className="usuarios-container">
                 <div className="usuarios-header">
                     <div className="header-text">
                         <h1 className="usuarios-title">Gestión de Usuarios</h1>
@@ -211,22 +155,13 @@ const GestionUsuarios = () => {
                         <table className="usuarios-table">
                             <thead>
                                 <tr>
-                                    <th 
-                                        className="sortable-header" 
-                                        onClick={() => handleSort('nombre')}
-                                    >
+                                    <th className="sortable-header" onClick={() => handleSort('nombre')}>
                                         Nombre {getSortIcon('nombre')}
                                     </th>
-                                    <th 
-                                        className="sortable-header" 
-                                        onClick={() => handleSort('email')}
-                                    >
+                                    <th className="sortable-header" onClick={() => handleSort('email')}>
                                         Email {getSortIcon('email')}
                                     </th>
-                                    <th 
-                                        className="sortable-header" 
-                                        onClick={() => handleSort('rol')}
-                                    >
+                                    <th className="sortable-header" onClick={() => handleSort('rol')}>
                                         Rol {getSortIcon('rol')}
                                     </th>
                                     <th>Acciones</th>
@@ -256,12 +191,21 @@ const GestionUsuarios = () => {
                                                 >
                                                     Editar
                                                 </button>
-                                                <button 
-                                                    className="delete-button action-button"
-                                                    onClick={() => handleDeleteUsuario(usuario.id)}
-                                                >
-                                                    Eliminar
-                                                </button>
+                                                {usuario.estado === 'inactivo' ? (
+                                                    <button 
+                                                        className="activate-button action-button"
+                                                        onClick={() => handleActivarUsuario(usuario.id)}
+                                                    >
+                                                        Activar
+                                                    </button>
+                                                ) : (
+                                                    <button 
+                                                        className="deactivate-button action-button"
+                                                        onClick={() => handleDesactivarUsuario(usuario.id)}
+                                                    >
+                                                        Desactivar
+                                                    </button>
+                                                )}
                                             </td>
                                         </tr>
                                     ))
@@ -279,18 +223,11 @@ const GestionUsuarios = () => {
                 </div>
             </div>
 
-            {isModalOpen && selectedUsuario && (
+            {isEditModalOpen && (
                 <EditarUsuarioModal 
                     usuario={selectedUsuario} 
-                    onClose={handleCloseModal}
+                    onClose={handleCloseEditModal}
                     onUpdate={handleUpdateUsuario}
-                />
-            )}
-
-            {isModalOpen && selectedIncidencia && (
-                <DetalleIncidenciaModal 
-                    incidencia={selectedIncidencia} 
-                    onClose={handleCloseModal} 
                 />
             )}
 
@@ -300,7 +237,7 @@ const GestionUsuarios = () => {
                     onCreate={handleCreateUsuario}
                 />
             )}
-        </div>
+        </>
     );
 };
 

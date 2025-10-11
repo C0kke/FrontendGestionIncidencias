@@ -1,12 +1,6 @@
 import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 
-/**
- * Componente que protege rutas basándose en el estado de autenticación y el rol.
- * * @param {array} allowedRoles - Roles permitidos (ej: ['administrador']).
- * @param {boolean} isLoginRoute - Indica si esta ruta es específicamente para el Login.
- * @returns El componente de la ruta o una redirección.
- */
 const ProtectedRoute = ({ allowedRoles, isLoginRoute }) => {
     const userString = localStorage.getItem('user');
     let userData = null;

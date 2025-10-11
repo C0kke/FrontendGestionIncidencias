@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import './styles/EditarUsuarioModal.css';
 
+const ROLES_DISPONIBLES = ['administrador', 'gestor', 'reportante', 'lector'];
+
 const EditarUsuarioModal = ({ usuario, onClose, onUpdate }) => {
     const [formData, setFormData] = useState({
         nombre: '',
         email: '',
         password: '',
-        rol: 'usuario'
+        rol: 'lector'
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -16,26 +18,19 @@ const EditarUsuarioModal = ({ usuario, onClose, onUpdate }) => {
             setFormData({
                 nombre: usuario.nombre || '',
                 email: usuario.email || '',
-                password: '', // Siempre vacío por seguridad
-                rol: usuario.rol || 'usuario'
+                password: '',
+                rol: ROLES_DISPONIBLES.includes(usuario.rol) ? usuario.rol : 'lector'
             });
         }
     }, [usuario]);
 
     const handleInputChange = (e) => {
-        const { name, value, type, checked } = e.target;
+        const { name, value } = e.target;
 
-        if (type === 'checkbox') {
-            setFormData(prev => ({
-                ...prev,
-                rol: checked ? 'administrador' : 'usuario'
-            }));
-        } else {
-            setFormData(prev => ({
-                ...prev,
-                [name]: value
-            }));
-        }
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
     };
 
     const handleSubmit = async (e) => {
@@ -43,7 +38,6 @@ const EditarUsuarioModal = ({ usuario, onClose, onUpdate }) => {
         setLoading(true);
         setError('');
 
-        // Validaciones básicas
         if (!formData.nombre.trim()) {
             setError('El nombre es requerido');
             setLoading(false);
@@ -56,7 +50,6 @@ const EditarUsuarioModal = ({ usuario, onClose, onUpdate }) => {
             return;
         }
 
-        // Validar formato de correo
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(formData.email)) {
             setError('El formato del correo no es válido');
@@ -151,25 +144,22 @@ const EditarUsuarioModal = ({ usuario, onClose, onUpdate }) => {
                         />
                     </div>
 
-                    <div className="form-group checkbox-group">
-                        <div className="checkbox-container">
-                            <input
-                                type="checkbox"
-                                id="esAdministrador"
-                                name="esAdministrador"
-                                checked={formData.rol === 'administrador'}
-                                onChange={handleInputChange}
-                                className="checkbox-input"
-                            />
-                            <label htmlFor="esAdministrador" className="checkbox-label">
-                                Es Administrador
-                            </label>
-                        </div>
-                        <div className="role-info">
-                            Rol actual: <span className={`role-badge ${formData.rol === 'administrador' ? 'admin-badge' : 'user-badge'}`}>
-                                {formData.rol}
-                            </span>
-                        </div>
+                    <div className="form-group">
+                        <label htmlFor="rol" className="form-label">Rol del Usuario</label>
+                        <select
+                            id="rol"
+                            name="rol"
+                            value={formData.rol}
+                            onChange={handleInputChange}
+                            className="form-input"
+                            required
+                        >
+                            {ROLES_DISPONIBLES.map(rol => (
+                                <option key={rol} value={rol}>
+                                    {rol.charAt(0).toUpperCase() + rol.slice(1)}
+                                </option>
+                            ))}
+                        </select>
                     </div>
 
                     {error && (

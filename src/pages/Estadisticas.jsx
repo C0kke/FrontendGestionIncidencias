@@ -1,10 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import Navbar from "../components/navbar";
-import NotificationDropdown from "../components/NotificacionDropdown";
 import './styles/Estadisticas.css';
-import DetalleIncidenciaModal from "../components/DetalleIncidenciaModal"; 
 
 // Librería de rechart para graficos
 import {
@@ -33,17 +29,6 @@ const Estadisticas = () => {
     incidenciasPorArea: []
   });
 
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedIncidencia, setSelectedIncidencia] = useState(null);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!localStorage.getItem('user') || localStorage.getItem('user') === 'undefined') {
-      navigate('/login');
-      return;
-    }
-  }, [navigate]);
-
   useEffect(() => {
     const fetchStats = async () => {
       setIsLoading(true);
@@ -71,8 +56,8 @@ const Estadisticas = () => {
 
         setStatsData(formattedData);
       } catch (err) {
-        console.error('Error al cargar estadísticas:', err.response.data);
-        setError('No se pudieron cargar las estadísticas.', err.response.data);
+        console.error('Error al cargar estadísticas:', err.response?.data);
+        setError('No se pudieron cargar las estadísticas.');
       } finally {
         setIsLoading(false);
       }
@@ -82,22 +67,6 @@ const Estadisticas = () => {
   }, []);
 
   const COLORS = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD'];
-
-  const handleOpenIncidenciaDetail = async (incidenciaId) => {
-        try {
-            const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/incidencias/${incidenciaId}`);
-            
-            setSelectedIncidencia(response.data);
-            setIsModalOpen(true);
-        } catch (error) {
-            console.error('Error al cargar la incidencia para el modal:', error);
-        }
-    };
-    
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setSelectedIncidencia(null); 
-  };
 
   if (error) {
     return (
@@ -112,40 +81,38 @@ const Estadisticas = () => {
   }
 
   return (
-    <div className="main-layout">
-        <Navbar />
-        <NotificationDropdown onOpenIncidenciaDetail={handleOpenIncidenciaDetail} />
-        {isLoading ? (
-            <div className="loading-card">
-                <div className="spinner"></div>
-                <p>Cargando estadísticas...</p>
-            </div>
-        ) : (
-          <div className="content-area stats-container">
-              <h1 className="stats-title">Dashboard de Estadísticas</h1>
-              <p className="stats-subtitle">Medición de tiempos de ciclo y tasa de incidentes resueltos para mejora continua.</p>
+    <>
+      {isLoading ? (
+        <div className="loading-card">
+          <div className="spinner"></div>
+          <p>Cargando estadísticas...</p>
+        </div>
+      ) : (
+        <div className="stats-container">
+          <h1 className="stats-title">Dashboard de Estadísticas</h1>
+          <p className="stats-subtitle">Medición de tiempos de ciclo y tasa de incidentes resueltos para mejora continua.</p>
 
-              <div className="kpi-grid">
-                  <div className="kpi-card">
-                      <h3>Total Incidencias</h3>
-                      <p className="kpi-value">
-                      {statsData.incidenciasPorEstado.reduce((sum, item) => sum + item.cantidad, 0)}
-                      </p>
-                  </div>
-              <div className="kpi-card">
-                  <h3>Incidencias Resueltas</h3>
-                  <p className="kpi-value">
-                  {statsData.incidenciasPorEstado.find(item => item.estado === 'Resuelto')?.cantidad || 0}
-                  </p>
-              </div>
-              <div className="kpi-card">
-                  <h3>Tiempo Promedio Resolución</h3>
-                  <p className="kpi-value">
-                  {statsData.tiempoPromedioPorPrioridad.length > 0 
-                      ? `${Math.round(statsData.tiempoPromedioPorPrioridad.reduce((sum, item) => sum + parseFloat(item.promedio_horas), 0) / statsData.tiempoPromedioPorPrioridad.length)}h`
-                      : 'N/A'}
-                  </p>
-              </div>
+          <div className="kpi-grid">
+            <div className="kpi-card">
+                <h3>Total Incidencias</h3>
+                <p className="kpi-value">
+                  {statsData.incidenciasPorEstado.reduce((sum, item) => sum + item.cantidad, 0)}
+                </p>
+            </div>
+            <div className="kpi-card">
+              <h3>Incidencias Resueltas</h3>
+              <p className="kpi-value">
+                {statsData.incidenciasPorEstado.find(item => item.estado === 'Resuelto')?.cantidad || 0}
+              </p>
+            </div>
+            <div className="kpi-card">
+              <h3>Tiempo Promedio Resolución</h3>
+              <p className="kpi-value">
+                {statsData.tiempoPromedioPorPrioridad.length > 0 
+                  ? `${Math.round(statsData.tiempoPromedioPorPrioridad.reduce((sum, item) => sum + parseFloat(item.promedio_horas), 0) / statsData.tiempoPromedioPorPrioridad.length)}h`
+                  : 'N/A'}
+              </p>
+            </div>
           </div>
 
           {/* Gráfico 1: Incidencias por Estado */}
@@ -217,15 +184,9 @@ const Estadisticas = () => {
               </PieChart>
             </ResponsiveContainer>
           </div>
-          </div>  
-        )}
-        {isModalOpen && selectedIncidencia && (
-            <DetalleIncidenciaModal 
-                incidencia={selectedIncidencia} 
-                onClose={handleCloseModal} 
-            />
-        )}
-    </div>
+        </div>  
+      )}
+    </>
   );
 };
 

@@ -95,7 +95,6 @@ const DetalleIncidenciaModal = ({ incidencia, onClose, onDownloadReporte }) => {
                     <button 
                         onClick={handleDownloadClick} 
                         className="modal-download-button"
-                        // Estilos en línea para una implementación rápida, puedes moverlos a CSS
                         style={{
                             marginTop: '20px', 
                             padding: '10px 15px', 

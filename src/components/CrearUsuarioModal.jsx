@@ -1,30 +1,24 @@
 import React, { useState } from 'react';
 import './styles/CrearUsuarioModal.css';
 
+const ROLES_DISPONIBLES = ['administrador', 'gestor', 'reportante', 'lector'];
+
 const CrearUsuarioModal = ({ onClose, onCreate }) => {
     const [formData, setFormData] = useState({
         nombre: '',
         email: '',
         password: '',
-        rol: 'usuario'
+        rol: 'lector'
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
     const handleInputChange = (e) => {
-        const { name, value, type, checked } = e.target;
-        
-        if (type === 'checkbox') {
-            setFormData(prev => ({
-                ...prev,
-                rol: checked ? 'administrador' : 'usuario'
-            }));
-        } else {
-            setFormData(prev => ({
-                ...prev,
-                [name]: value
-            }));
-        }
+        const { name, value } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
     };
 
     const handleCancel = () => {
@@ -32,7 +26,7 @@ const CrearUsuarioModal = ({ onClose, onCreate }) => {
             nombre: '',
             email: '',
             password: '',
-            rol: 'usuario'
+            rol: 'lector'
         });
         setError('');
         onClose();
@@ -43,7 +37,6 @@ const CrearUsuarioModal = ({ onClose, onCreate }) => {
         setLoading(true);
         setError('');
 
-        // Validaciones estrictas - todos los campos son obligatorios
         if (!formData.nombre.trim()) {
             setError('El nombre es obligatorio');
             setLoading(false);
@@ -62,7 +55,6 @@ const CrearUsuarioModal = ({ onClose, onCreate }) => {
             return;
         }
 
-        // Validar formato de email
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(formData.email)) {
             setError('El formato del email no es válido');
@@ -70,7 +62,6 @@ const CrearUsuarioModal = ({ onClose, onCreate }) => {
             return;
         }
 
-        // Validar longitud de contraseña
         if (formData.password.length < 6) {
             setError('La contraseña debe tener al menos 6 caracteres');
             setLoading(false);
@@ -162,25 +153,24 @@ const CrearUsuarioModal = ({ onClose, onCreate }) => {
                         </div>
                     </div>
 
-                    <div className="form-group checkbox-group">
-                        <div className="checkbox-container">
-                            <input
-                                type="checkbox"
-                                id="esAdministrador"
-                                name="esAdministrador"
-                                checked={formData.rol === 'administrador'}
-                                onChange={handleInputChange}
-                                className="checkbox-input"
-                            />
-                            <label htmlFor="esAdministrador" className="checkbox-label">
-                                Es Administrador
-                            </label>
-                        </div>
-                        <div className="role-info">
-                            Rol seleccionado: <span className={`role-badge ${formData.rol === 'administrador' ? 'admin-badge' : 'user-badge'}`}>
-                                {formData.rol}
-                            </span>
-                        </div>
+                    <div className="form-group">
+                        <label htmlFor="rol" className="form-label">
+                            Rol del Usuario <span className="required">*</span>
+                        </label>
+                        <select
+                            id="rol"
+                            name="rol"
+                            value={formData.rol}
+                            onChange={handleInputChange}
+                            className="form-input"
+                            required
+                        >
+                            {ROLES_DISPONIBLES.map(rol => (
+                                <option key={rol} value={rol}>
+                                    {rol.charAt(0).toUpperCase() + rol.slice(1)} 
+                                </option>
+                            ))}
+                        </select>
                     </div>
 
                     {error && (

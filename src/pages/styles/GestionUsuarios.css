@@ -170,7 +170,7 @@
 
 .role-badge {
     display: inline-block;
-    padding: 0.25rem 0.75rem;
+    padding: 0.25rem ;
     border-radius: 9999px;
     font-size: 0.75rem;
     font-weight: 500;
@@ -191,7 +191,7 @@
     display: flex;
     gap: 0.5rem;
     align-items: center;
-    justify-content: center;
+    justify-content: start;
 }
 
 .action-button {
@@ -224,12 +224,22 @@
     border-color: #2563eb;
 }
 
-.delete-button {
+.activate-button {
+    border-color: #10b981;
+    color: #10b981;
+}
+
+.activate-button:hover {
+    background-color: #d1fae5;
+    border-color: #059669;
+}
+
+.deactivate-button {
     border-color: #ef4444;
     color: #ef4444;
 }
 
-.delete-button:hover {
+.deactivate-button:hover {
     background-color: #fef2f2;
     border-color: #dc2626;
 }
