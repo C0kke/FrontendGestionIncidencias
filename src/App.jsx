@@ -27,7 +27,7 @@ const App = () => {
               <Route path="/tareas" element={<Tareas />} />
               <Route path="/perfil" element={<Perfil />} />
               <Route path="/estadisticas" element={<Estadisticas />}/>
-              <Route element={<ProtectedRoute allowedRoles={['administrador']} />}>
+              <Route element={<ProtectedRoute allowedRoles={['administrador', 'gestor']} />}>
                 <Route path="/gestion-usuarios" element={<GestionUsuarios />} />
                 <Route path="/gestion-incidencias" element={<GestionIncidencias />} />
               </Route>

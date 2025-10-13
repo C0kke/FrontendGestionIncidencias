@@ -2,7 +2,9 @@ import React, { useEffect, useState } from "react";
 import './styles/Reporte.css';
 import axios from "axios";
 import { useAuth } from "../utils/AuthContext";
+import { hasPermission } from "../utils/permissions";
 import { downloadFileFromResponse } from "../utils/DownloadReporte";
+import { Navigate } from "react-router-dom";
 
 const areas = ["Pasillo industrial 3", "Planta eléctrica"];
 const modulos = ["Eléctrica", "Mecánica", "Civil", "Estructural"];
@@ -30,25 +32,30 @@ const Reporte = () => {
     const [loading, setLoading] = useState(false);
     const [mensaje, setMensaje] = useState('');
     
+    const canAssignUser = user && (user.rol === 'administrador' || user.rol === 'gestor');
+
     useEffect(() => {
         const fetchUsuarios = async () => {
             try {
                 const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/usuarios`);
                 const activeUsers = response.data.filter(u => u.estado === 'activo');
-                console.log("Usuario context", user);
                 setUsuarios(activeUsers);
+                // Set a default responsible user if the list is loaded
                 if (activeUsers.length > 0) {
                     setResponsable(activeUsers[0].id);
                 }
             } catch(error) {
                 console.error("Error al obtener usuarios: " + error);
+                setMensaje("Error al cargar la lista de usuarios.");
             }
         };
 
-        if (user?.rol === 'administrador') {
+        if (canAssignUser) {
             fetchUsuarios();
+        } else if (user) {
+            setResponsable(user.id);
         }
-    }, [user]);
+    }, [user, canAssignUser]);
 
     useEffect(() => {
         const intervalId = setInterval(() => {
@@ -66,7 +73,11 @@ const Reporte = () => {
         setModulo(modulos[0]);
         setDetalle('');
         setPrioridad(PRIORITIES[0].id);
-        setResponsable(usuarios.length > 0 ? usuarios[0].id : '');
+        if (canAssignUser) {
+            setResponsable(usuarios.length > 0 ? usuarios[0].id : '');
+        } else if (user) {
+            setResponsable(user.id);
+        }
         setFoto(null);
     };
 
@@ -77,7 +88,7 @@ const Reporte = () => {
         formData.append('detalle', detalle);
         formData.append('hora', hora);
         formData.append('prioridad', prioridad);
-        formData.append('responsable_id', responsable); 
+        formData.append('responsable_id', canAssignUser ? responsable : user.id); 
         if (foto) {
             formData.append('foto', foto);
         }
@@ -135,6 +146,10 @@ const Reporte = () => {
         }
     };
 
+    if (!user || !hasPermission(user.rol, 'puedeCrearIncidencias')) {
+        return <Navigate to="/tareas" replace />;
+    }
+
     return (
         <>
             <div className="report-container">
@@ -178,7 +193,7 @@ const Reporte = () => {
                         </div>
                     </div>
                     
-                    {user?.rol === 'administrador' && (
+                    {canAssignUser && (
                         <div className="form-group">
                             <label htmlFor="responsable-select" className="form-label">Responsable</label>
                             <select id="responsable-select" className="form-input" value={responsable} onChange={(e) => setResponsable(e.target.value)} required>

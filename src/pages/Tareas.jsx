@@ -3,6 +3,7 @@ import axios from "axios";
 import './styles/Tareas.css';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { useAuth } from "../utils/AuthContext";
+import { hasPermission } from "../utils/permissions";
 import { useModal } from "../components/MainLayout";
 
 const ESTADOS = {
@@ -101,9 +102,11 @@ const Tareas = () => {
                 const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/incidencias`);
                 const todasLasIncidencias = response.data;
 
-                const incidenciasFiltradas = user.rol === 'administrador'
-                    ? todasLasIncidencias
-                    : todasLasIncidencias.filter(inc => inc.responsable_id === user.id);
+                // Filter incidents based on user role permissions
+                const canViewAll = hasPermission(user.rol, 'puedeVerTodasLasIncidencias');
+                const incidenciasFiltradas = canViewAll
+                    ? todasLasIncidencias // Admins, Gestores, and Lectores see all
+                    : todasLasIncidencias.filter(inc => inc.responsable_id === user.id); // Reportadores see only their own
                 
                 setIncidencias(incidenciasFiltradas);
                 setError(null);
@@ -133,6 +136,12 @@ const Tareas = () => {
 
         if (!destination || (source.droppableId === destination.droppableId && source.index === destination.index)) {
             return;
+        }
+
+        // Check if user has permission to change status
+        if (!hasPermission(user.rol, 'puedeCambiarEstadoIncidencia')) {
+            alert("No tienes permiso para cambiar el estado de una incidencia.");
+            return; // Do not update state or call backend
         }
 
         const incidenciaId = parseInt(draggableId);
@@ -165,7 +174,7 @@ const Tareas = () => {
                 <h1 className="board-title">Tablero de Seguimiento de Incidencias</h1>
                 <p className="board-subtitle">Arrastra y suelta las tarjetas para cambiar el estado de la tarea.</p>
                 
-                <DragDropContext onDragEnd={onDragEnd}>
+                <DragDropContext onDragEnd={onDragEnd} isDragDisabled={!hasPermission(user.rol, 'puedeCambiarEstadoIncidencia')}>
                     <div className="kanban-board">
                         {ESTADO_KEYS.map(estado => (
                             <ColumnaTareas

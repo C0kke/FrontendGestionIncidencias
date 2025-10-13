@@ -4,8 +4,12 @@ import axios from "axios";
 import DetalleIncidenciaModal from "../components/DetalleIncidenciaModal"; 
 import EditarUsuarioModal from "../components/EditarUsuarioModal";
 import CrearUsuarioModal from "../components/CrearUsuarioModal";
+import { useAuth } from "../utils/AuthContext";
+import { hasPermission } from "../utils/permissions";
+import { Navigate } from "react-router-dom";
 
 const GestionUsuarios = () => {
+    const { user } = useAuth();
     const [usuarios, setUsuarios] = useState([]);
     const [loading, setLoading] = useState(false);
     const [mensaje, setMensaje] = useState('');
@@ -17,6 +21,11 @@ const GestionUsuarios = () => {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
     useEffect(() => {
+        // Only fetch if the user has permission
+        if (!user || !hasPermission(user.rol, 'puedeGestionarUsuarios')) {
+            setLoading(false);
+            return;
+        }
         fetchUsuarios();
     }, []);
 
@@ -127,6 +136,11 @@ const GestionUsuarios = () => {
         };
         return roleClasses[rol] || 'lector-badge';
     };
+
+    // Redirect if the user does not have permission to view this page
+    if (!user || !hasPermission(user.rol, 'puedeGestionarUsuarios')) {
+        return <Navigate to="/tareas" replace />;
+    }
 
     return (
         <>

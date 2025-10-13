@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from "react";
 import "./styles/GestionUsuarios.css";
 import axios from "axios";
-import DetalleIncidenciaModal from "../components/DetalleIncidenciaModal";
+import { Navigate } from "react-router-dom";
+import { useAuth } from "../utils/AuthContext";
+import { hasPermission } from "../utils/permissions";
+import DetalleIncidenciaModal from "../components/DetalleIncidenciaModal"; 
 
 const GestionIncidencias = () => {
+  const { user } = useAuth();
   const [incidencias, setIncidencias] = useState([]);
   const [filteredIncidencias, setFilteredIncidencias] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -26,6 +30,10 @@ const GestionIncidencias = () => {
   const [responsableMap, setResponsableMap] = useState({});
 
   useEffect(() => {
+    if (!user || !hasPermission(user.rol, "puedeVerTodasLasIncidencias")) {
+      setLoading(false);
+      return;
+    }
     fetchIncidencias();
   }, []);
 
@@ -124,6 +132,26 @@ const GestionIncidencias = () => {
     setIsModalOpen(false);
     setSelectedIncidencia(null);
   };
+
+  const handleEliminarIncidencia = async (id) => {
+    if (!window.confirm("¿Estás seguro de que deseas eliminar esta incidencia? Esta acción no se puede deshacer.")) {
+      return;
+    }
+    try {
+      await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/incidencias/${id}`);
+      setMensaje("Incidencia eliminada correctamente.");
+      fetchIncidencias(); // Recargar la lista
+      setTimeout(() => setMensaje(""), 3000);
+    } catch (error) {
+      console.error("Error al eliminar la incidencia:", error);
+      setMensaje("Error al eliminar la incidencia.");
+    }
+  };
+
+  // Redirigir si el usuario no tiene permiso
+  if (!user || !hasPermission(user.rol, "puedeVerTodasLasIncidencias")) {
+    return <Navigate to="/tareas" replace />;
+  }
 
   // Paginación
   const totalPages = Math.max(1, Math.ceil(filteredIncidencias.length / ITEMS_PER_PAGE));
@@ -242,6 +270,16 @@ const GestionIncidencias = () => {
                         <button className="edit-button action-button" onClick={() => handleOpenIncidenciaDetail(i)}>
                           Ver
                         </button>
+                        {user && hasPermission(user.rol, "puedeEditarIncidencias") && (
+                          <button className="edit-button action-button" onClick={() => handleOpenIncidenciaDetail(i)}>
+                            Editar
+                          </button>
+                        )}
+                        {user && hasPermission(user.rol, "puedeEliminarIncidencias") && (
+                          <button className="deactivate-button action-button" onClick={() => handleEliminarIncidencia(i.id)}>
+                            Eliminar
+                          </button>
+                        )}
                       </td>
                     </tr>
                   ))
