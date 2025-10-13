@@ -1,20 +1,11 @@
 import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
+import { useAuth } from '../utils/AuthContext';
 
 const ProtectedRoute = ({ allowedRoles, isLoginRoute }) => {
-    const userString = localStorage.getItem('user');
-    let userData = null;
-
-    if (userString && userString !== 'undefined') {
-        try {
-            userData = JSON.parse(userString);
-        } catch (e) {
-            console.error("Error al parsear el usuario de localStorage:", e);
-        }
-    }
-
-    const isLoggedIn = !!userData;
-    const userRole = userData ? userData.rol : null;
+    const { user } = useAuth();
+    const isLoggedIn = !!user;
+    const userRole = user ? user.rol : null;
 
     if (isLoginRoute) {
         if (isLoggedIn) {

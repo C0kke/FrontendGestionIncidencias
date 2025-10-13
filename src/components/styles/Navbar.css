@@ -24,7 +24,6 @@
     background-color: transparent;
     border: solid 0.5px var(--color-text-dark);
     text-align: center;
-    transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
     cursor: pointer;
 }
 

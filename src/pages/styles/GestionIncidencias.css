@@ -56,7 +56,6 @@
   border-radius: 0.5rem;
   font-size: 0.95rem;
   outline: none;
-  transition: border-color 0.2s ease;
 }
 
 .search-input:focus {
@@ -71,7 +70,6 @@
   padding: 0.6rem 1rem;
   font-size: 0.95rem;
   cursor: pointer;
-  transition: background-color 0.2s ease;
 }
 
 .filter-toggle-button:hover {
@@ -184,7 +182,6 @@
   cursor: pointer;
   font-size: 0.85rem;
   font-weight: 500;
-  transition: all 0.2s ease;
 }
 
 .edit-button {
@@ -212,7 +209,6 @@
   border-radius: 0.5rem;
   padding: 0.5rem 1rem;
   cursor: pointer;
-  transition: background-color 0.2s ease;
 }
 
 .pagination-button:disabled {

@@ -18,7 +18,12 @@ const Reporte = () => {
     const [area, setArea] = useState(areas[0]);
     const [modulo, setModulo] = useState(modulos[0]);
     const [detalle, setDetalle] = useState('');
-    const [hora, setHora] = useState(new Date().toISOString().slice(0, 16));
+    const [hora, setHora] = useState(() => {
+        const now = new Date();
+        const timezoneOffset = now.getTimezoneOffset() * 60000;
+        const localISOTime = new Date(now.getTime() - timezoneOffset).toISOString().slice(0, 16);
+        return localISOTime;
+    });
     const [prioridad, setPrioridad] = useState(PRIORITIES[0].id);
     const [responsable, setResponsable] = useState(''); 
     const [foto, setFoto] = useState(null);
@@ -44,6 +49,17 @@ const Reporte = () => {
             fetchUsuarios();
         }
     }, [user]);
+
+    useEffect(() => {
+        const intervalId = setInterval(() => {
+            const now = new Date();
+            const timezoneOffset = now.getTimezoneOffset() * 60000;
+            const localISOTime = new Date(now.getTime() - timezoneOffset).toISOString().slice(0, 16);
+            setHora(localISOTime);
+        }, 350000);
+
+        return () => clearInterval(intervalId);
+    }, []);
 
     const handleResetInputs = () => {
         setArea(areas[0]);

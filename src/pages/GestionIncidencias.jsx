@@ -94,7 +94,27 @@ const GestionIncidencias = () => {
     return [...new Set(incidencias.map((i) => i[field]).filter(Boolean))];
   };
     
-  // --- Lógica del Modal (se moverá a MainLayout después) ---
+  const formatChileanDate = (isoString) => {
+    if (!isoString) return 'N/A';
+    try {
+      const date = new Date(isoString);
+      if (isNaN(date.getTime())) {
+          return 'Fecha inválida';
+      }
+      return new Intl.DateTimeFormat('es-CL', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        timeZone: 'America/Santiago'
+      }).format(date);
+    } catch (error) {
+      console.error("Error formatting date:", error);
+      return isoString;
+    }
+  };
+
   const handleOpenIncidenciaDetail = (incidencia) => {
     setSelectedIncidencia(incidencia);
     setIsModalOpen(true);
@@ -104,7 +124,6 @@ const GestionIncidencias = () => {
     setIsModalOpen(false);
     setSelectedIncidencia(null);
   };
-  // --- Fin de la lógica del Modal ---
 
   // Paginación
   const totalPages = Math.max(1, Math.ceil(filteredIncidencias.length / ITEMS_PER_PAGE));
@@ -196,14 +215,10 @@ const GestionIncidencias = () => {
             <table className="usuarios-table">
               <thead>
                 <tr>
-                  <th>Área de Incidencia</th>
-                  <th>Módulo</th>
-                  <th>Prioridad</th>
-                  <th>Estado</th>
-                  <th>Responsable</th>
+                  <th>Id</th>
                   <th>Fecha de Incidencia</th>
-                  <th>Fecha Creación</th>
-                  <th>Fecha Cierre</th>
+                  <th>Descripcion</th>
+                  <th>Estado</th>
                   <th>Última Actualización</th>
                   <th>Acciones</th>
                 </tr>
@@ -218,19 +233,11 @@ const GestionIncidencias = () => {
                 ) : (
                   currentIncidencias.map((i) => (
                     <tr key={i.id} className="usuario-row">
-                      <td>{i.area}</td>
-                      <td>{i.modulo}</td>
-                      <td>
-                        <span className={`role-badge ${i.prioridad === "alta" ? "admin-badge" : i.prioridad === "media" ? "user-badge" : "neutral-badge"}`}>
-                          {i.prioridad}
-                        </span>
-                      </td>
+                      <td>{i.id}</td>
+                      <td>{formatChileanDate(i.hora)}</td>
+                      <td>{i.descripcion}</td>
                       <td>{i.estado}</td>
-                      <td>{i.responsable_id ? responsableMap[i.responsable_id] ?? "Cargando..." : "Sin asignar"}</td>
-                      <td>{i.hora ? new Date(i.hora).toLocaleString() : "-"}</td>
-                      <td>{i.fecha_creacion ? new Date(i.fecha_creacion).toLocaleString() : "-"}</td>
-                      <td>{i.fecha_cierre ? new Date(i.fecha_cierre).toLocaleString() : "-"}</td>
-                      <td>{i.fecha_actualizacion ? new Date(i.fecha_actualizacion).toLocaleString() : "-"}</td>
+                      <td>{formatChileanDate(i.fecha_actualizacion)}</td>
                       <td className="actions-container">
                         <button className="edit-button action-button" onClick={() => handleOpenIncidenciaDetail(i)}>
                           Ver
@@ -246,13 +253,13 @@ const GestionIncidencias = () => {
 
         <div className="pagination-container">
           <button className="pagination-button" onClick={handlePrevPage} disabled={currentPage === 1}>
-            ⬅ Anterior
+            {'<'} Anterior
           </button>
           <span className="pagination-info">
             Página {currentPage} de {totalPages}
           </span>
           <button className="pagination-button" onClick={handleNextPage} disabled={currentPage === totalPages}>
-            Siguiente ➡
+            Siguiente {'>'}
           </button>
         </div>
       </div>

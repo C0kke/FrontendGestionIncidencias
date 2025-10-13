@@ -2,24 +2,14 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import './styles/NotificacionDropdown.css'; 
+import { useAuth } from '../utils/AuthContext';
 
 const NotificacionDropdown = ({ onOpenIncidenciaDetail }) => {
     const [notifications, setNotifications] = useState([]);
     const [isOpen, setIsOpen] = useState(false);
-    const [userId, setUserId] = useState(null);
+    const { user } = useAuth();
+    const userId = user?.id;
     const navigate = useNavigate();
-
-    useEffect(() => {
-        const userData = localStorage.getItem('user');
-        if (userData && userData !== 'undefined') {
-            try {
-                const user = JSON.parse(userData);
-                setUserId(user.id);
-            } catch (error) {
-                console.error("Error al parsear datos de usuario:", error);
-            }
-        }
-    }, []);
 
     const fetchNotifications = useCallback(async () => {
         if (!userId) return;

@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 import './styles/Login.css';
+import { useAuth } from '../utils/AuthContext';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [mensaje, setMensaje] = useState('');
-  const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -18,8 +19,7 @@ const Login = () => {
         password,
       });
       setMensaje('¡Inicio de sesión exitoso!');
-      localStorage.setItem('user', JSON.stringify(response.data.user));
-      navigate('/inicio');
+      login(response.data.user); // Use the login function from context
     } catch (error) {
       console.error(error)
       setMensaje(error.response?.data || 'Error de conexión. Inténtalo de nuevo.');
