@@ -4,7 +4,7 @@ import axios from "axios";
 import EditarUsuarioModal from "../components/EditarUsuarioModal";
 import CrearUsuarioModal from "../components/CrearUsuarioModal";
 import { useAuth } from "../utils/AuthContext";
-import { hasPermission } from "../utils/permissions";
+import { hasPermission } from "../utils/Permissions";
 import { Navigate } from "react-router-dom";
 
 const GestionUsuarios = () => {

@@ -3,7 +3,7 @@ import axios from "axios";
 import './styles/Tareas.css';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { useAuth } from "../utils/AuthContext";
-import { hasPermission } from "../utils/permissions";
+import { hasPermission } from "../utils/Permissions";
 import { useModal } from "../components/MainLayout";
 
 const ESTADOS = {

@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from '../utils/AuthContext';
-import { hasPermission } from "../utils/permissions";
+import { hasPermission } from "../utils/Permissions";
 import './styles/Navbar.css';
 
 const Navbar = () => {

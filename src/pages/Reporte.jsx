@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import './styles/Reporte.css';
 import axios from "axios";
 import { useAuth } from "../utils/AuthContext";
-import { hasPermission } from "../utils/permissions";
+import { hasPermission } from "../utils/Permissions";
 import { downloadFileFromResponse } from "../utils/DownloadReporte";
 import { Navigate } from "react-router-dom";
 

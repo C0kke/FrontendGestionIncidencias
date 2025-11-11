@@ -3,7 +3,7 @@ import "./styles/GestionIncidencias.css";
 import axios from "axios";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../utils/AuthContext";
-import { hasPermission } from "../utils/permissions";
+import { hasPermission } from "../utils/Permissions";
 import DetalleIncidenciaModal from "../components/DetalleIncidenciaModal";
 
 const GestionIncidencias = () => {
