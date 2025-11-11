@@ -159,6 +159,31 @@
     border-bottom: none;
 }
 
+usuario_foto {
+    text-align: center; 
+    width: 80px; 
+    padding: 0.5rem !important;
+}
+
+.usuario_foto img,
+.usuario_foto .profile-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #e5e7eb;
+    display: flex; 
+    margin: 0 auto;
+    transform: translate(-50%);
+}
+
+.usuario_foto .profile-icon {
+    background-color: #f3f4f6;
+    color: #9ca3af;
+    padding: 6px;
+    box-sizing: border-box;
+}
+
 .usuario-nombre {
     font-weight: 500;
     color: #1f2937;

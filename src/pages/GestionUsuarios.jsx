@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import './styles/GestionUsuarios.css';
 import axios from "axios";
-import DetalleIncidenciaModal from "../components/DetalleIncidenciaModal"; 
 import EditarUsuarioModal from "../components/EditarUsuarioModal";
 import CrearUsuarioModal from "../components/CrearUsuarioModal";
 import { useAuth } from "../utils/AuthContext";
@@ -10,6 +9,9 @@ import { Navigate } from "react-router-dom";
 
 const GestionUsuarios = () => {
     const { user } = useAuth();
+    const defaultSvg = <svg className="profile-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
     const [usuarios, setUsuarios] = useState([]);
     const [loading, setLoading] = useState(false);
     const [mensaje, setMensaje] = useState('');
@@ -21,7 +23,6 @@ const GestionUsuarios = () => {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
     useEffect(() => {
-        // Only fetch if the user has permission
         if (!user || !hasPermission(user.rol, 'puedeGestionarUsuarios')) {
             setLoading(false);
             return;
@@ -68,8 +69,22 @@ const GestionUsuarios = () => {
     };
 
     const handleUpdateUsuario = async (updatedUsuario) => {
+        let userId;
+        
+        if (updatedUsuario instanceof FormData) {
+            userId = updatedUsuario.get("id");
+        } else {
+            userId = updatedUsuario.id;
+        }
+
         try {
-            await axios.put(`${import.meta.env.VITE_API_BASE_URL}/usuarios/${updatedUsuario.id}`, updatedUsuario);
+            await axios.put(
+                `${import.meta.env.VITE_API_BASE_URL}/usuarios/${userId}`,
+                updatedUsuario,
+                updatedUsuario instanceof FormData
+                    ? { headers: { "Content-Type": "multipart/form-data" } }
+                    : { headers: { "Content-Type": "application/json" } }
+            );
             setMensaje('Usuario actualizado correctamente');
             handleCloseEditModal();
             fetchUsuarios();
@@ -137,7 +152,6 @@ const GestionUsuarios = () => {
         return roleClasses[rol] || 'lector-badge';
     };
 
-    // Redirect if the user does not have permission to view this page
     if (!user || !hasPermission(user.rol, 'puedeGestionarUsuarios')) {
         return <Navigate to="/tareas" replace />;
     }
@@ -172,6 +186,9 @@ const GestionUsuarios = () => {
                                     <th className="sortable-header" onClick={() => handleSort('nombre')}>
                                         Nombre {getSortIcon('nombre')}
                                     </th>
+                                    <th className="sortable-header" onClick={() => handleSort('foto_perfil')}>
+                                        Foto de Perfil {getSortIcon('foto_perfil')}
+                                    </th>
                                     <th className="sortable-header" onClick={() => handleSort('email')}>
                                         Email {getSortIcon('email')}
                                     </th>
@@ -192,6 +209,13 @@ const GestionUsuarios = () => {
                                     sortedUsuarios.map((usuario) => (
                                         <tr key={usuario.id} className="usuario-row">
                                             <td className="usuario-nombre">{usuario.nombre}</td>
+                                            <td className="usuario_foto">
+                                                {usuario.foto_perfil ? (
+                                                    <img src={usuario.foto_perfil} alt={`Foto de ${usuario.nombre}`} />
+                                                ) : (
+                                                    defaultSvg
+                                                )}
+                                            </td>
                                             <td className="usuario-email">{usuario.email}</td>
                                             <td>
                                                 <span className={`role-badge ${getRoleBadge(usuario.rol)}`}>

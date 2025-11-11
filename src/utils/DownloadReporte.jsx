@@ -21,20 +21,43 @@ const downloadFileFromResponse = async (response, defaultFilename) => {
     window.URL.revokeObjectURL(url); 
 };
 
-const handleDownloadReporteById = async (id) => {
-    try {
-        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/incidencias/descargar-reporte/${id}`);
+const handleDownloadReporteById = async (id, setMensaje, setLoading) => {
+  setLoading?.(true);
+  setMensaje?.('');
 
-        if (response.ok) {
-            await downloadFileFromResponse(response, `Reporte_Incidencia_${id}.docx`);
-        } else {
-            const errorText = await response.text();
-            alert(`Error al descargar el reporte: ${errorText}`);
-        }
-    } catch (error) {
-        console.error('Error de red al descargar:', error);
-        alert('Error de conexión con el servidor.');
+  try {
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/incidencias/descargar-reporte/${id}`);
+
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(text || `HTTP ${response.status}`);
     }
+
+    const blob = await response.blob();
+
+    const cd = response.headers.get('Content-Disposition');
+    let filename = `Reporte_Incidencia_${id}.docx`;
+    if (cd) {
+      const match = /filename="?([^"]+)"?/i.exec(cd);
+      if (match?.[1]) filename = match[1];
+    }
+
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+
+    setMensaje?.('Reporte descargado correctamente');
+  } catch (err) {
+    console.error('Descarga fallida:', err);
+    setMensaje?.(`Error: ${err.message || 'No se pudo descargar el reporte.'}`);
+  } finally {
+    setLoading?.(false);
+  }
 };
 
 export { handleDownloadReporteById, downloadFileFromResponse };

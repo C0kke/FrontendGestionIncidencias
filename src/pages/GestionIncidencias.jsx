@@ -4,7 +4,7 @@ import axios from "axios";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../utils/AuthContext";
 import { hasPermission } from "../utils/permissions";
-import DetalleIncidenciaModal from "../components/DetalleIncidenciaModal"; 
+import DetalleIncidenciaModal from "../components/DetalleIncidenciaModal";
 
 const GestionIncidencias = () => {
   const { user } = useAuth();
@@ -50,6 +50,46 @@ const GestionIncidencias = () => {
       setMensaje("Error al cargar las incidencias. Consulta la consola.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDownloadReporteById = async (id, setMensaje, setLoading) => {
+    setLoading?.(true);
+    setMensaje?.('');
+
+    try {
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/incidencias/descargar-reporte/${id}`);
+
+        if (response.ok) {
+            const blob = await response.blob();
+
+            const contentDisposition = response.headers.get('Content-Disposition');
+            let filename = `Reporte_Incidencia_${id}.docx`;
+
+            if (contentDisposition) {
+                const matches = /filename="?([^"]+)"?/.exec(contentDisposition);
+                if (matches && matches[1]) filename = matches[1];
+            }
+
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            window.URL.revokeObjectURL(url);
+
+            setMensaje?.('Reporte descargado correctamente');
+        } else {
+            const errorText = await response.text();
+            throw new Error(errorText || 'Error en el servidor');
+        }
+    } catch (error) {
+        console.error('Error al descargar reporte:', error);
+        setMensaje?.(`Error: ${error.message || 'No se pudo completar la descarga.'}`);
+    } finally {
+        setLoading?.(false);
     }
   };
 
@@ -140,7 +180,7 @@ const GestionIncidencias = () => {
     try {
       await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/incidencias/${id}`);
       setMensaje("Incidencia eliminada correctamente.");
-      fetchIncidencias(); // Recargar la lista
+      fetchIncidencias();
       setTimeout(() => setMensaje(""), 3000);
     } catch (error) {
       console.error("Error al eliminar la incidencia:", error);
@@ -148,7 +188,6 @@ const GestionIncidencias = () => {
     }
   };
 
-  // Redirigir si el usuario no tiene permiso
   if (!user || !hasPermission(user.rol, "puedeVerTodasLasIncidencias")) {
     return <Navigate to="/tareas" replace />;
   }
@@ -267,14 +306,12 @@ const GestionIncidencias = () => {
                       <td>{i.estado}</td>
                       <td>{formatChileanDate(i.fecha_actualizacion)}</td>
                       <td className="actions-container">
-                        <button className="edit-button action-button" onClick={() => handleOpenIncidenciaDetail(i)}>
+                        <button className="edit-button action-button" onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenIncidenciaDetail(i);
+                        }}>
                           Ver
                         </button>
-                        {user && hasPermission(user.rol, "puedeEditarIncidencias") && (
-                          <button className="edit-button action-button" onClick={() => handleOpenIncidenciaDetail(i)}>
-                            Editar
-                          </button>
-                        )}
                         {user && hasPermission(user.rol, "puedeEliminarIncidencias") && (
                           <button className="deactivate-button action-button" onClick={() => handleEliminarIncidencia(i.id)}>
                             Eliminar
@@ -303,7 +340,7 @@ const GestionIncidencias = () => {
       </div>
 
       {isModalOpen && selectedIncidencia && (
-        <DetalleIncidenciaModal incidencia={selectedIncidencia} onClose={handleCloseModal} />
+        <DetalleIncidenciaModal incidencia={selectedIncidencia} onClose={handleCloseModal} onDownloadReporte={handleDownloadReporteById} />
       )}
     </>
   );

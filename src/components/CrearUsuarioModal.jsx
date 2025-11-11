@@ -10,6 +10,10 @@ const CrearUsuarioModal = ({ onClose, onCreate }) => {
         password: '',
         rol: 'lector'
     });
+
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [previewImageUrl, setPreviewImageUrl] = useState(null);
+
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
@@ -21,6 +25,14 @@ const CrearUsuarioModal = ({ onClose, onCreate }) => {
         }));
     };
 
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setSelectedFile(file);
+            setPreviewImageUrl(URL.createObjectURL(file));
+        }
+    };
+
     const handleCancel = () => {
         setFormData({
             nombre: '',
@@ -28,6 +40,9 @@ const CrearUsuarioModal = ({ onClose, onCreate }) => {
             password: '',
             rol: 'lector'
         });
+        setSelectedFile(null);
+        setPreviewImageUrl(null);
+
         setError('');
         onClose();
     };
@@ -69,14 +84,19 @@ const CrearUsuarioModal = ({ onClose, onCreate }) => {
         }
 
         try {
-            const dataToSend = {
-                nombre: formData.nombre.trim(),
-                email: formData.email.trim(),
-                password: formData.password.trim(),
-                rol: formData.rol
-            };
+            const dataToSubmit = new FormData();
+            
+            dataToSubmit.append('nombre', formData.nombre.trim());
+            dataToSubmit.append('email', formData.email.trim());
+            dataToSubmit.append('password', formData.password.trim());
+            dataToSubmit.append('rol', formData.rol);
 
-            await onCreate(dataToSend);
+            if (selectedFile) {
+                dataToSubmit.append('foto', selectedFile);
+            }
+            
+            await onCreate(dataToSubmit);
+            handleCancel();
         } catch (error) {
             setError('Error al crear el usuario');
             console.error('Error:', error);
@@ -92,16 +112,50 @@ const CrearUsuarioModal = ({ onClose, onCreate }) => {
     };
 
     return (
-        <div className="modal-overlay" onClick={handleBackdropClick}>
+        <div className="modal-overlay" onClick={handleBackdropClick}>            
             <div className="modal-container crear-usuario-modal">
                 <div className="modal-header">
                     <h2>Crear Nuevo Usuario</h2>
                     <button className="modal-close-button" onClick={handleCancel}>
-                        ×
+                        &times;
                     </button>
                 </div>
 
                 <form onSubmit={handleSubmit} className="modal-form">
+                    
+                    <div className="form-group">
+                        <label className="form-label">
+                            Foto de perfil (opcional)
+                        </label>
+                        
+                        <div className="image-uploader">
+                            
+                            <div className="image-preview">
+                                {previewImageUrl ? (
+                                    <img src={previewImageUrl} alt="Vista previa de perfil" />
+                                ) : (
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="placeholder-icon">
+                                        <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="12" cy="7" r="4"></circle>
+                                    </svg>
+                                )}
+                            </div>
+
+                            <input
+                                type="file"
+                                id="foto"
+                                accept="image/png, image/jpeg"
+                                onChange={handleFileChange}
+                                className="file-input"
+                            />
+                            
+                            <label htmlFor="foto" className="file-upload-label">
+                                {previewImageUrl ? 'Cambiar foto' : 'Subir foto'}
+                            </label>
+                            
+                        </div>
+                    </div>
+
                     <div className="form-group">
                         <label htmlFor="nombre" className="form-label">
                             Nombre <span className="required">*</span>

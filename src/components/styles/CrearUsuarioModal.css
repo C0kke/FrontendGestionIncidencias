@@ -369,3 +369,69 @@
     outline: 2px solid #3b82f6;
     outline-offset: 2px;
 }
+
+.image-uploader {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+}
+
+.image-preview {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 3px dashed #e5e7eb;
+    background-color: #f8fafc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    transition: border-color 0.2s ease;
+}
+
+.image-preview:hover {
+    border-color: #cbd5e1;
+}
+
+.image-preview .placeholder-icon {
+    color: #9ca3af;
+}
+
+.image-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.file-input {
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+}
+
+.file-upload-label {
+    padding: 0.625rem 1.25rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #3b82f6;
+    background-color: #eef2ff;
+    cursor: pointer;
+    border: 2px solid #eef2ff;
+    transition: all 0.2s ease;
+}
+
+.file-upload-label:hover {
+    background-color: #e0e7ff;
+    border-color: #c7d2fe;
+}
+
+.file-input:focus + .file-upload-label {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+}
