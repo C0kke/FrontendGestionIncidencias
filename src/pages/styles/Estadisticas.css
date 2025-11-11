@@ -2,7 +2,6 @@
 .content-area {
     flex: 1;
     padding: 2rem;
-    margin-left: 250px; /* Ancho del navbar */
     overflow-y: auto;
 }
 

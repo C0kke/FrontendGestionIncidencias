@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import axios from 'axios';
 import './styles/Login.css';
 import { useAuth } from '../utils/AuthContext';
@@ -48,6 +47,8 @@ const Login = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              autoComplete="email"
+              inputMode="email"
               className="form-input"
             />
           </div>
@@ -65,6 +66,8 @@ const Login = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              autoComplete="current-password"
+              enterKeyHint="go"
               className="form-input"
             />
           </div>
@@ -77,7 +80,9 @@ const Login = () => {
         </form>
 
         {mensaje && (
-          <p 
+          <p
+            role="status"
+            aria-live="polite"
             className={`message-box ${mensaje.includes('exitoso') ? 'success' : 'error'}`}
           >
             {mensaje}

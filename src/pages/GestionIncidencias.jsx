@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import "./styles/GestionUsuarios.css";
+import "./styles/GestionIncidencias.css";
 import axios from "axios";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../utils/AuthContext";

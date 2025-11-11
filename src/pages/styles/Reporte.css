@@ -3,11 +3,16 @@
     overflow-y: auto;
     background-color: var(--color-bg-light); 
     text-align: center;
-    margin-right: 20%;
+    width: 100%;
+    padding-left: clamp(1rem, 4vw, 3rem);
+    padding-right: clamp(1rem, 4vw, 3rem);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .report-title {
-    font-size: 2rem; 
+    font-size: clamp(1.25rem, 2.5vw + 1rem, 2rem);
     font-weight: 800;
     color: var(--color-text-dark);
     margin-bottom: 0.5rem;
@@ -22,9 +27,10 @@
     background-color: var(--color-white);
     border-radius: 1rem; 
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    max-width: 50vw;
-    width: 70%;
-    margin: 0 auto;
+    width: 100%;
+    max-width: 56rem; /* no ocupar tanto ancho en desktop */
+    margin: 0 auto;    /* centrar dentro del área disponible */
+    padding: clamp(1rem, 2.5vw, 2rem);
 }
 
 .form-reporte .form-group {
@@ -173,4 +179,32 @@
 .message-box.error {
     background-color: #fee2e2;
     color: #b91c1c;
+}
+
+/* Responsive adjustments for mobile */
+@media (max-width: 768px) {
+    .report-container {
+        margin: 0 auto;
+        padding: 1rem;
+    }
+    .form-card {
+        width: 100%;
+        max-width: 42rem;
+    }
+    .priority-selector {
+        flex-wrap: wrap;
+        row-gap: 0.5rem;
+    }
+    .button-group {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1200px) {
+    .form-card {
+        max-width: 48rem;
+        width: 75%;
+    }
 }
