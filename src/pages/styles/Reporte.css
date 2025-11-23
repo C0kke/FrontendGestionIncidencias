@@ -224,6 +224,11 @@
     align-items: center;
     justify-content: center;
     background-color: #f9fafb;
+
+    svg {
+        width: 80px;
+        height: 80px;
+    }
 }
 
 .image-preview img {
